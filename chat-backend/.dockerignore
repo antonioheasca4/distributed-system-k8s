@@ -1,0 +1,9 @@
+.gradle
+build
+out
+*.iml
+.idea
+
+.gradle
+build
+!build/libs/heasca-0.0.1-SNAPSHOT.jar

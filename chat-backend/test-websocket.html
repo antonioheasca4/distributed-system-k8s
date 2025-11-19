@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>WebSocket Chat Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    #messages {
+      list-style-type: none;
+      padding: 0;
+      margin-top: 20px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    #messages li {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    #messages li:last-child {
+      border-bottom: none;
+    }
+    .sender {
+      font-weight: bold;
+      margin-right: 10px;
+    }
+    .timestamp {
+      font-size: 0.8em;
+      color: #888;
+    }
+    input {
+      padding: 8px;
+      width: 70%;
+    }
+    button {
+      padding: 8px 15px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h2>Test WebSocket Chat</h2>
+  <div>
+    <input type="text" id="name" placeholder="Nume" style="width: 20%;" />
+    <input type="text" id="message" placeholder="Mesaj" style="width: 50%;" />
+    <button onclick="send()">Trimite</button>
+  </div>
+
+  <ul id="messages"></ul>
+
+  <script>
+    const socket = new WebSocket("ws://localhost:30088/chat");
+
+    socket.onopen = () => console.log("Conectat la WebSocket");
+    socket.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        addMessage(data);
+      } catch (e) {
+        // Dacă nu e JSON, afișează mesajul brut
+        addRawMessage(event.data);
+      }
+    };
+
+    socket.onerror = (err) => {
+      console.error("Eroare WebSocket:", err);
+    };
+
+    function addMessage(data) {
+      const li = document.createElement("li");
+      
+      const senderSpan = document.createElement("span");
+      senderSpan.className = "sender";
+      senderSpan.textContent = data.sender + ":";
+      
+      const contentSpan = document.createElement("span");
+      contentSpan.className = "content";
+      contentSpan.textContent = " " + data.content;
+      
+      const timeSpan = document.createElement("span");
+      timeSpan.className = "timestamp";
+      const date = new Date(data.timestamp);
+      timeSpan.textContent = " [" + date.toLocaleTimeString() + "]";
+      
+      li.appendChild(senderSpan);
+      li.appendChild(contentSpan);
+      li.appendChild(timeSpan);
+      
+      document.getElementById("messages").appendChild(li);
+    }
+    
+    function addRawMessage(text) {
+      const li = document.createElement("li");
+      li.textContent = text;
+      document.getElementById("messages").appendChild(li);
+    }
+
+    function send() {
+      const name = document.getElementById("name").value.trim();
+      const message = document.getElementById("message").value.trim();
+      
+      if (name && message) {
+        socket.send(name + ": " + message);
+        document.getElementById("message").value = "";
+      } else {
+        alert("Introduceți numele și mesajul!");
+      }
+    }
+    
+    // Permite trimiterea mesajului cu Enter
+    document.getElementById("message").addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        send();
+      }
+    });
+  </script>
+</body>
+</html>

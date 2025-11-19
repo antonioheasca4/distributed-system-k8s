@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: joomla-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: joomla-db
+  template:
+    metadata:
+      labels:
+        app: joomla-db
+    spec:
+      containers:
+        - name: mariadb
+          image: localhost:32000/mariadb
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MARIADB_ROOT_PASSWORD
+              value: parola123
+            - name: MARIADB_DATABASE
+              value: joomla
+            - name: MARIADB_USER
+              value: joomla
+            - name: MARIADB_PASSWORD
+              value: parola123
+      #     volumeMounts:
+      #       - name: mariadb-storage
+      #         mountPath: /var/lib/mysql
+      # volumes:
+      #   - name: mariadb-storage
+      #     persistentVolumeClaim:
+      #       claimName: mariadb-pvc

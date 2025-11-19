@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: image-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: image-frontend
+  template:
+    metadata:
+      labels:
+        app: image-frontend
+    spec:
+      containers:
+        - name: image-frontend
+          image: localhost:32000/ia-frontend
+          ports:
+            - containerPort: 80

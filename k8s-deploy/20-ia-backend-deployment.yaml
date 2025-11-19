@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: image-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: image-backend
+  template:
+    metadata:
+      labels:
+        app: image-backend
+    spec:
+      containers:
+        - name: backend
+          image: localhost:32000/ia-backend
+          ports:
+            - containerPort: 8000
+          env:
+            - name: BLOB_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: azure-secrets
+                  key: blob
+            - name: BLOB_ACCOUNT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: azure-secrets
+                  key: blobkey
+            - name: VISION_ENDPOINT
+              value: "https://imagevisionaitemastd.cognitiveservices.azure.com/"
+            - name: VISION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: azure-secrets
+                  key: vision
+            - name: SQL_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: azure-secrets
+                  key: sql
+
